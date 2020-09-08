@@ -1,0 +1,23 @@
+﻿<Window x:Class="View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:View"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <!-- Note the binding: this links the Text property to CounterValue -->
+        <!-- Whenever CounterValue changes, the TextBlock will be updated -->
+        <!-- The .Value is necessary because we're working with cells: we want to bind to the value inside the cell, not to the cell itself -->
+        <!-- In short, every time you bind to a cell, you will want to add .Value -->
+        <TextBlock x:Name="counterViewer" Grid.Row="0" TextAlignment="Center" FontSize="64" Text="{Binding CounterValue.Value}" />
+        <Button Grid.Row="1" Click="OnIncrease">
+            Increase
+        </Button>
+    </Grid>
+</Window>
