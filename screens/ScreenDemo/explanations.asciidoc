@@ -1,0 +1,175 @@
+= Explanations
+
+== General Idea
+
+The basic idea behind multiple screens is actually very simple:
+
+* Each screen is represented by an object.
+* We have a "magical variable" that contains the current screen.
+
+When we overwrite this magical variable, the view is automatically updated.
+
+[source]
+----
+// This is pseudocode
+Screen currentScreen;
+
+currentScreen = new ScreenA(); // ScreenA is visible
+currentScreen = new ScreenB(); // ScreenB is visible
+----
+
+Given this general idea, how do we actually implement it?
+
+== Implementation
+
+=== Screen Representation
+
+Each screen needs data to show.
+The MVVM way would be to offer this data through a ViewModel object.
+Thus, it makes sense to have one ViewModel class per screen.
+Let's also have them share a supertype:
+
+[source,csharp]
+----
+// Abstract supertype
+abstract class ScreenViewModel
+{
+    // Data shared by all screens
+}
+
+// Represents screen A
+class ScreenAViewModel : ScreenViewModel
+{
+    // Data specific to screen A
+}
+
+// Represents screen B
+class ScreenBViewModel : ScreenViewModel
+{
+    // Data specific to screen B
+}
+----
+
+=== Magical Variable
+
+Next, we have to implement our `currentScreen` variable.
+We could just make define some variable
+
+[source,csharp]
+----
+ScreenViewModel currentScreen;
+----
+
+We can now assign any screen subclass to this variable.
+However, this variable's value can change over time, namely when we wish to switch screens.
+It is important for the View to be aware of these changes, so we need `currentScreen` to be observable.
+The most straightforward way to achieve this is to rely on cells:
+
+[source,csharp]
+----
+ICell<ScreenViewModel> currentScreen;
+----
+
+=== Synchronizing the View
+
+We need a way for the view to synchronize itself automatically with the `currentScreen` variable.
+And that's exactly what bindings do.
+This means we can create a top level View Model that features a `CurrentScreen` property to which the View can bind itself.
+In the sample code, we named this top level View Model `MainViewModel`.
+
+[source,csharp]
+----
+class MainViewModel
+{
+    public ICell<ScreenViewModel> CurrentScreen { get; }
+}
+----
+
+Remember that the View can only bind to *properties*, not to fields, hence the `{ get; }`.
+
+=== ContentControl
+
+Okay, we now know what to bind *to*.
+But what is it we are binding?
+
+WPF offers a `ContentControl`.
+It acts as some form of "container" whose contents can be switched.
+In our case, we would use such a `ContentControl` at the top level and have it switch between screens.
+
+The `ContentControl` has a `Content` property, which we will bind to `CurrentScreen.Value` (the `.Value` is required due to `CurrentScreen` being a cell).
+This informs the `ContentControl` as to what screen should be shown.
+
+However, `CurrentScreen` contains one of our screen ViewModel classes.
+WPF has no clue as how to render these.
+Luckily, there's an easy way to help out WPF: we can define a `DataTemplate` that specifies what to show for each type of screen:
+
+[source,xaml]
+----
+<ContentControl Content="{Binding CurrentScreen.Value}">
+    <ContentControl.Resources>
+        <DataTemplate DataType="{x:Type local:ScreenAViewModel}">
+            <!-- Controls to be shown when screen A is active -->
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:ScreenBViewModel}">
+            <!-- Controls to be shown when screen B is active -->
+        </DataTemplate>
+    </ContentControl.Resources>
+</ContentControl>
+----
+
+=== Switching Screens
+
+As explained earlier, switching screens is simply a matter of assigning a new value to `CurrentScreen`:
+
+[source,csharp]
+----
+CurrentScreen.Value = new ScreenBViewModel(); // Switches to screen B
+----
+
+The switches generally occur from within the screens.
+For example, there could a a button on screen A to switch to screen B.
+For screen A to be able to implement the switch to screen B, it needs access to the `CurrentScreen` cell.
+More generally, one could say that every screen ought to be able to switch to another screen, therefore each screen needs access to the `CurrentScreen` cell.
+
+Achieving this is pretty straightforward: just pass along the cell to each screen ViewModel.
+Since this is common to all screens, we can put this functionality in the superclass.
+
+[source,csharp]
+----
+abstract class ScreenViewModel
+{
+    protected ScreenViewModel(ICell<ScreenViewModel> currentScreen)
+    {
+        this.CurrentScreen = currentScreen;
+    }
+
+    public ICell<ScreenViewModel> CurrentScreen { get; }
+}
+
+class ScreenAViewModel : ScreenViewModel
+{
+    public ScreenAViewModel(ICell<ScreenViewModel> currentScreen) : base(currentScreen)
+    {
+
+    }
+}
+
+class ScreenBViewModel : ScreenViewModel
+{
+    public ScreenBViewModel(ICell<ScreenViewModel> currentScreen) : base(currentScreen)
+    {
+
+    }
+}
+----
+
+It is important to realize there is only one `CurrentScreen` cell in the application and that it has to be passed around to everyone who needs to be able to switch screens.
+
+The code to switch screens from within a screen ViewModel is
+
+[source,csharp]
+----
+this.CurrentScreen.Value = new ScreenBViewModel(this.CurrentScreen);
+----
+
+Note how we pass along the cell to the constructor of `ScreenBViewModel` and how the resulting object is then stored in the cell.
