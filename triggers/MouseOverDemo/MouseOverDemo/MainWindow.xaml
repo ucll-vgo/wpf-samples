@@ -1,0 +1,26 @@
+﻿<Window x:Class="MouseOverDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MouseOverDemo"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Button>
+        <Button.Template>
+            <ControlTemplate TargetType="{x:Type Button}">
+                <Border Name="border" Background="#AAA" Padding="5" CornerRadius="50" Margin="10">
+                    <Ellipse Name="ellipse" Fill="Red" Width="64" Height="64" />
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="border" Property="Background" Value="#888" />
+                        <Setter TargetName="ellipse" Property="Width" Value="128" />
+                        <Setter TargetName="ellipse" Property="Height" Value="128" />
+                        <Setter TargetName="ellipse" Property="Fill" Value="Blue" />
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Button.Template>
+    </Button>
+</Window>
