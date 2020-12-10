@@ -1,0 +1,45 @@
+﻿<Window x:Class="AnimationTrigger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AnimationTrigger"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Button>
+        <Button.Template>
+            <ControlTemplate TargetType="{x:Type Button}">
+                <Border Name="border" Background="#AAA" Padding="5" CornerRadius="50" Margin="10">
+                    <Ellipse Name="ellipse" Width="64" Height="64">
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="Red" x:Name="ellipseFill" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="border" Property="Background" Value="#888" />
+                        <Trigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation Storyboard.TargetName="ellipseFill" Storyboard.TargetProperty="Color" From="Red" To="Blue" Duration="0:0:1.0" />
+                                    <DoubleAnimation Storyboard.TargetName="ellipse" Storyboard.TargetProperty="Width" From="64" To="128" Duration="0:0:1.0" />
+                                    <DoubleAnimation Storyboard.TargetName="ellipse" Storyboard.TargetProperty="Height" From="64" To="128" Duration="0:0:1.0" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.EnterActions>
+                        <Trigger.ExitActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation Storyboard.TargetName="ellipseFill" Storyboard.TargetProperty="Color" From="Blue" To="Red" Duration="0:0:2.0" />
+                                    <DoubleAnimation Storyboard.TargetName="ellipse" Storyboard.TargetProperty="Width" From="128" To="64" Duration="0:0:2.0" />
+                                    <DoubleAnimation Storyboard.TargetName="ellipse" Storyboard.TargetProperty="Height" From="128" To="64" Duration="0:0:2.0" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.ExitActions>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Button.Template>
+    </Button>
+</Window>
