@@ -1,0 +1,57 @@
+﻿<Window x:Class="DataTrigger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DataTrigger"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="border" Background="#AAA" Padding="5" CornerRadius="50" Margin="10">
+                        <Ellipse Name="ellipse" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--
+                            DataTriggers fetch their data using bindings
+                            This can be used as an alternative to IValueConverters
+                        -->
+                        <DataTrigger Binding="{Binding Color.Value}" Value="1">
+                            <Setter TargetName="ellipse" Property="Fill" Value="Red" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Color.Value}" Value="2">
+                            <Setter TargetName="ellipse" Property="Fill" Value="Green" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Color.Value}" Value="3">
+                            <Setter TargetName="ellipse" Property="Fill" Value="Blue" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Big.Value}" Value="False">
+                            <Setter TargetName="ellipse" Property="Width" Value="32" />
+                            <Setter TargetName="ellipse" Property="Height" Value="32" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Big.Value}" Value="True">
+                            <Setter TargetName="ellipse" Property="Width" Value="128" />
+                            <Setter TargetName="ellipse" Property="Height" Value="128" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <Slider Grid.Row="1" Grid.Column="0" x:Name="slider" Minimum="1" Maximum="3" Value="{Binding Color.Value}" IsSnapToTickEnabled="True" TickFrequency="1" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Color.Value}" />
+        <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding Big.Value}">
+            Big
+        </CheckBox>
+    </Grid>
+</Window>
